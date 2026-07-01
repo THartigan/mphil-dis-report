@@ -2,127 +2,312 @@
 \else     \graphicspath{{Sections/2_background_figs/Vector/}{Sections/2_background_figs/}}
 \fi
 
-\chapter{Background} \label{chap:background}
+% \chapter{Background} \label{chap:background}
 
-Here, we present a summary of the theory and literature required to understand
-the experiments presented in this work. We focus on CT reconstruction, diffusion
-models and their use in solving inverse problems, and the PaDIS method. We then
-summarise the literature relevant to PaDIS, including both its motivators and
-derivatives. The formulation presented in Section~\ref{sec:basics} summarises
-the key points presented by Kak and Stanley~\cite{Kak_Stanley}, and utilises
-their notation.
+% Here, we present a summary of the theory and literature required to understand
+% the experiments presented in this work. We focus on CT reconstruction, diffusion
+% models and their use in solving inverse problems, and the PaDIS method. We then
+% summarise the literature relevant to PaDIS, including both its motivators and
+% derivatives. The formulation presented in Section~\ref{sec:basics} summarises
+% the key points presented by Kak and Stanley~\cite{Kak_Stanley}, and utilises
+% their notation.
 
-\section{Basics of Computed Tomography} \label{sec:basics}
+% \section{Basics of Computed Tomography} \label{sec:basics}
 
-In X-ray CT, an object is illuminated by X-rays from multiple angles, with the
-intensity of radiation transmitted through the object measured by detectors on
-the opposite side of the object. Through this method, we aim to reconstruct a
-spatial distribution of the linear attenuation coefficient, written $f(x,y)$ in
-the two-dimensional case, and with units of inverse length. This gives the
-probability per unit path length that an X-ray photon is removed from the beam
-by absorption or scattering. Therefore, assuming X-rays are monoenergetic, the
-transmitted intensity along a ray $L$ should obey the Beer-Lambert law,
-\begin{equation} I=I_0 \exp\left(-\int_L f(x,y) \, ds\right), \end{equation}
-where $I_0$ is the intensity of radiation incident on the object, $I$ is the
-detected intensity, and $ds$ denotes integration along the ray. Taking
-logarithms then gives the linearised projection \begin{equation}
-P=-\log\left(\frac{I}{I_0}\right)=\int_L f(x,y)\, ds, \end{equation} meaning
-log-normalised CT measurements are approximated by a line integral through the
-attenuation image. This approach assumes that beams are narrow, monoenergetic
-and non-diffracting, and neglects scattering, beam hardening and finite aperture
-effects, all of which contribute in clinical CT. However, it provides a
-tractable mathematical basis within which to consider reconstruction algorithms.
+% In X-ray CT, an object is illuminated by X-rays from multiple angles, with the
+% intensity of radiation transmitted through the object measured by detectors on
+% the opposite side of the object. Through this method, we aim to reconstruct a
+% spatial distribution of the linear attenuation coefficient, written $f(x,y)$ in
+% the two-dimensional case, and with units of inverse length. This gives the
+% probability per unit path length that an X-ray photon is removed from the beam
+% by absorption or scattering. Therefore, assuming X-rays are monoenergetic, the
+% transmitted intensity along a ray $L$ should obey the Beer-Lambert law,
+% \begin{equation} I=I_0 \exp\left(-\int_L f(x,y) \, ds\right), \end{equation}
+% where $I_0$ is the intensity of radiation incident on the object, $I$ is the
+% detected intensity, and $ds$ denotes integration along the ray. Taking
+% logarithms then gives the linearised projection \begin{equation}
+% P=-\log\left(\frac{I}{I_0}\right)=\int_L f(x,y)\, ds, \end{equation} meaning
+% log-normalised CT measurements are approximated by a line integral through the
+% attenuation image. This approach assumes that beams are narrow, monoenergetic
+% and non-diffracting, and neglects scattering, beam hardening and finite aperture
+% effects, all of which contribute in clinical CT. However, it provides a
+% tractable mathematical basis within which to consider reconstruction algorithms.
 
-\section{Detector Geometries} \label{sec:detector-geometries}
+% \section{Detector Geometries} \label{sec:detector-geometries}
 
-\section{Line Integrals, Projections and Sinograms} \label{sec:
-line-integrals-projections-sinograms}
+% \section{Line Integrals, Projections and Sinograms} \label{sec:
+% line-integrals-projections-sinograms}
 
-For a fixed projection angle $\theta$, we can define a line in the image plane
-by \begin{equation} x\cos \theta + y\sin \theta=t, \label{eq:line_t}
-\end{equation} where $t$ is the perpendicular distance of the line from the
-origin, as shown in Figure~\ref{fig:line_integral}. The integral over this line
-can then be denoted as \begin{equation} P_\theta(t) = \int_{L_{(\theta,t)}} f(x,
-y) \, ds, \end{equation} or equivalently in Dirac delta form, \begin{equation}
-P_\theta(t)=\int_{-\infty}^{\infty} \int_{-\infty}^{\infty} f(x,y)\delta(x\cos
-\theta+ y\sin \theta-t) \, dx\, dy. \end{equation} Notably, the projection
-$P_\theta(t)$ is therefore also the Radon transform~\cite{radon} of $f(x,y)$ at
-angle $\theta$. We collect a line or grid of these projections simultaneously,
-each corresponding to the same $\theta$ alignment, but different values of $t$.
-In a hypothetical parallel-beam scan, all of these $\theta$-aligned rays are
-parallel, whereas in a realistic fan-beam or cone-beam scan, the angle refers to
-the central projection angle, from which other rays diverge.
+% For a fixed projection angle $\theta$, we can define a line in the image plane
+% by \begin{equation} x\cos \theta + y\sin \theta=t, \label{eq:line_t}
+% \end{equation} where $t$ is the perpendicular distance of the line from the
+% origin, as shown in Figure~\ref{fig:line_integral}. The integral over this line
+% can then be denoted as \begin{equation} P_\theta(t) = \int_{L_{(\theta,t)}} f(x,
+% y) \, ds, \end{equation} or equivalently in Dirac delta form, \begin{equation}
+% P_\theta(t)=\int_{-\infty}^{\infty} \int_{-\infty}^{\infty} f(x,y)\delta(x\cos
+% \theta+ y\sin \theta-t) \, dx\, dy. \end{equation} Notably, the projection
+% $P_\theta(t)$ is therefore also the Radon transform~\cite{radon} of $f(x,y)$ at
+% angle $\theta$. We collect a line or grid of these projections simultaneously,
+% each corresponding to the same $\theta$ alignment, but different values of $t$.
+% In a hypothetical parallel-beam scan, all of these $\theta$-aligned rays are
+% parallel, whereas in a realistic fan-beam or cone-beam scan, the angle refers to
+% the central projection angle, from which other rays diverge.
 
-In practice, we sample these projection lines from $K$ different angular views,
-$\theta_1, \theta_2, \dots, \theta_K$, and collect the projections within $N$
-detector bins corresponding to $t_1, t_2, \dots, t_N$, forming an array of
-measurements called a sinogram, denoted \begin{equation} Y_{j,
-i}=P_{\theta_i}(t_j), \quad i=1,\dots, K, \quad j=1,\dots, N. \end{equation}
-Here, each column is a line of projections at directed angle $\theta$, and each
-row corresponds to one detector bin. By vectorising the image of $f(x,y)$ as
-$\mathbf{x}\in \mathbb{R}^n$, and the sinogram as $\mathbf{y}\in \mathbb{R}^m$,
-the discretised CT forward model can be written as \begin{equation}
-\mathbf{y}=A\mathbf{x}+\boldsymbol{\eta}, \label{eq:forward-model}
-\end{equation} where $A\in \mathbb{R}^{m \times n}$ is the discretised forward
-projection operator, $\boldsymbol{\eta}$ encodes noise and modelling errors, and
-$m=KN$ in 2D. We can then express this operator $A$ explicitly by denoting an
-image pixel $\ell$ by $\Omega_\ell$, and using the pixel basis function
-\begin{equation} \phi_\ell(x,y)= \begin{cases} 1, & (x,y)\in \Omega_\ell,\\ 0, &
-\text{otherwise}, \end{cases} \end{equation} such that we can approximate the
-attenuation field as \begin{equation} f(x,y)\approx \sum_{\ell=1}^n x_\ell
-\phi_\ell(x,y), \end{equation} where $x_\ell$ is the value of pixel $\ell$.
-Therefore, substituting into the line integral and comparing with
-Equation~\eqref{eq:forward-model} gives \begin{align} P_{\theta_i}(t_j) &\approx
-\sum_{\ell=1}^n x_\ell \int_{L_{(\theta_i,t_j)}} \phi_\ell(x,y)\,ds,\\ \implies
-A_{(j,i),\ell} &=\int_{L_{(\theta_i, t_j)}}\phi_\ell(x,y)\, ds, \end{align} so
-each row of $A$ corresponds to a single measured ray, with entries encoding the
-path length of that ray within each image pixel. This matrix is generally
-extremely large, and impractical to store or manipulate.
+% In practice, we sample these projection lines from $K$ different angular views,
+% $\theta_1, \theta_2, \dots, \theta_K$, and collect the projections within $N$
+% detector bins corresponding to $t_1, t_2, \dots, t_N$, forming an array of
+% measurements called a sinogram, denoted \begin{equation} Y_{j,
+% i}=P_{\theta_i}(t_j), \quad i=1,\dots, K, \quad j=1,\dots, N. \end{equation}
+% Here, each column is a line of projections at directed angle $\theta$, and each
+% row corresponds to one detector bin. By vectorising the image of $f(x,y)$ as
+% $\mathbf{x}\in \mathbb{R}^n$, and the sinogram as $\mathbf{y}\in \mathbb{R}^m$,
+% the discretised CT forward model can be written as \begin{equation}
+% \mathbf{y}=A\mathbf{x}+\boldsymbol{\eta}, \label{eq:forward-model}
+% \end{equation} where $A\in \mathbb{R}^{m \times n}$ is the discretised forward
+% projection operator, $\boldsymbol{\eta}$ encodes noise and modelling errors, and
+% $m=KN$ in 2D. We can then express this operator $A$ explicitly by denoting an
+% image pixel $\ell$ by $\Omega_\ell$, and using the pixel basis function
+% \begin{equation} \phi_\ell(x,y)= \begin{cases} 1, & (x,y)\in \Omega_\ell,\\ 0, &
+% \text{otherwise}, \end{cases} \end{equation} such that we can approximate the
+% attenuation field as \begin{equation} f(x,y)\approx \sum_{\ell=1}^n x_\ell
+% \phi_\ell(x,y), \end{equation} where $x_\ell$ is the value of pixel $\ell$.
+% Therefore, substituting into the line integral and comparing with
+% Equation~\eqref{eq:forward-model} gives \begin{align} P_{\theta_i}(t_j) &\approx
+% \sum_{\ell=1}^n x_\ell \int_{L_{(\theta_i,t_j)}} \phi_\ell(x,y)\,ds,\\ \implies
+% A_{(j,i),\ell} &=\int_{L_{(\theta_i, t_j)}}\phi_\ell(x,y)\, ds, \end{align} so
+% each row of $A$ corresponds to a single measured ray, with entries encoding the
+% path length of that ray within each image pixel. This matrix is generally
+% extremely large, and impractical to store or manipulate.
 
-\section{The Fourier Slice Theorem} \label{sec:fourier-slice-theorem}
+% \section{The Fourier Slice Theorem} \label{sec:fourier-slice-theorem}
 
-Using the perpendicular distance of a ray from the origin, Equation~\eqref{eq:
-line_t}, and the distance along that ray given by \begin{equation} s=-x\sin
-\theta+ y \cos\theta, \end{equation} give the projection at angle $\theta$ as
-\begin{equation} P_\theta(t)= \int_{-\infty}^{\infty} f(t\cos\theta-s\sin\theta,
-\;t\sin\theta+s\cos\theta)\,ds. \end{equation} Taking the Fourier transform of
-this with respect to $t$ then gives \begin{equation} S_\theta(\omega) =
-\int_{-\infty}^{\infty}\int_{-\infty}^{\infty} f(t\cos\theta-s\sin\theta,\;
-t\sin\theta+s\cos\theta) e^{-2\pi i \omega t} \,ds\,dt, \end{equation} so
-converting to the $(x,y)$ coordinate system gives \begin{equation}
-S_\theta(\omega) = \int_{-\infty}^{\infty}\int_{-\infty}^{\infty} f(x,y)e^{-2\pi
-i \omega(x\cos\theta+y\sin\theta)} \,dx\,dy = F(\omega \cos \theta, \omega \sin
-\theta). \end{equation} Therefore, the Fourier transform of a projection gives
-the two-dimensional Fourier transform of the object along the radial line at the
-same angle.
+% Using the perpendicular distance of a ray from the origin, Equation~\eqref{eq:
+% line_t}, and the distance along that ray given by \begin{equation} s=-x\sin
+% \theta+ y \cos\theta, \end{equation} give the projection at angle $\theta$ as
+% \begin{equation} P_\theta(t)= \int_{-\infty}^{\infty} f(t\cos\theta-s\sin\theta,
+% \;t\sin\theta+s\cos\theta)\,ds. \end{equation} Taking the Fourier transform of
+% this with respect to $t$ then gives \begin{equation} S_\theta(\omega) =
+% \int_{-\infty}^{\infty}\int_{-\infty}^{\infty} f(t\cos\theta-s\sin\theta,\;
+% t\sin\theta+s\cos\theta) e^{-2\pi i \omega t} \,ds\,dt, \end{equation} so
+% converting to the $(x,y)$ coordinate system gives \begin{equation}
+% S_\theta(\omega) = \int_{-\infty}^{\infty}\int_{-\infty}^{\infty} f(x,y)e^{-2\pi
+% i \omega(x\cos\theta+y\sin\theta)} \,dx\,dy = F(\omega \cos \theta, \omega \sin
+% \theta). \end{equation} Therefore, the Fourier transform of a projection gives
+% the two-dimensional Fourier transform of the object along the radial line at the
+% same angle.
 
-\section{Dosage and Noise} \label{sec:dosage-and-noise}
+% \section{Dosage and Noise} \label{sec:dosage-and-noise}
 
-The radiation dose imparted on a patient is directly proportional to the total
-energy deposited in the tissue. For this reason, it is also directly
-proportional to the energy of the photons used, the number of photons released
-at each view, and the number of views acquired. Dosage can therefore be reduced
-by decreasing any of these properties. However, these each decrease imaging
-quality.
+% The radiation dose imparted on a patient is directly proportional to the total
+% energy deposited in the tissue. For this reason, it is also directly
+% proportional to the energy of the photons used, the number of photons released
+% at each view, and the number of views acquired. Dosage can therefore be reduced
+% by decreasing any of these properties. However, these each decrease imaging
+% quality.
 
-Measurement noise is intrinsically linked to the intensity of radiation used.
-If $N_0$ photons are incident on the sample along a ray with projection value
-$p$, then we expect to detect \begin{equation} \bar N = N_0 \exp(-p).
-\end{equation} As this is a counting experiment, the noise due to counting
-errors can be approximated as Poisson such that \begin{equation} N\sim
-\operatorname{Poisson}(\bar N). \end{equation} The projection estimate is
-\begin{equation} \hat p =-\log \left(\frac{N}{N_0}\right), \end{equation} so at
-high photon counts where $\operatorname{Poisson}(\bar N)\approx \mathcal{N}(\bar
-N, \bar N)$, Taylor expansion gives \begin{equation} \hat p \approx p+\eta,
-\quad \eta \sim \mathcal N\left(0, \frac{1}{\bar N}\right). \end{equation} At
-low photon counts, however, we may have $N=0$, in which case $\hat p=-\log 0$,
-which is undefined. Furthermore, relative fluctuations are large, preventing
-Taylor expansion, and in general, the noise after the logarithm becomes
-non-Gaussian, signal-dependent, biased and possibly undefined~\cite{}, meaning
-this domain is often better to model with the Poisson likelihood. Decreasing
-intensity therefore increases the difficulty in modelling, and is not discussed
-in detail in this work. However, interesting advances in using diffusion models
-trained with these sorts of priors can be found at~\cite{}.
+% Measurement noise is intrinsically linked to the intensity of radiation used.
+% If $N_0$ photons are incident on the sample along a ray with projection value
+% $p$, then we expect to detect \begin{equation} \bar N = N_0 \exp(-p).
+% \end{equation} As this is a counting experiment, the noise due to counting
+% errors can be approximated as Poisson such that \begin{equation} N\sim
+% \operatorname{Poisson}(\bar N). \end{equation} The projection estimate is
+% \begin{equation} \hat p =-\log \left(\frac{N}{N_0}\right), \end{equation} so at
+% high photon counts where $\operatorname{Poisson}(\bar N)\approx \mathcal{N}(\bar
+% N, \bar N)$, Taylor expansion gives \begin{equation} \hat p \approx p+\eta,
+% \quad \eta \sim \mathcal N\left(0, \frac{1}{\bar N}\right). \end{equation} At
+% low photon counts, however, we may have $N=0$, in which case $\hat p=-\log 0$,
+% which is undefined. Furthermore, relative fluctuations are large, preventing
+% Taylor expansion, and in general, the noise after the logarithm becomes
+% non-Gaussian, signal-dependent, biased and possibly undefined~\cite{}, meaning
+% this domain is often better to model with the Poisson likelihood. Decreasing
+% intensity therefore increases the difficulty in modelling, and is not discussed
+% in detail in this work. However, interesting advances in using diffusion models
+% trained with these sorts of priors can be found at~\cite{}.
 
-Decreasing the number of views also decreases the dosage, but in accordance
-with the Fourier slice theorem, this also limits...
+% Decreasing the number of views also decreases the dosage, but in accordance
+% with the Fourier slice theorem, this also limits...
+
+\chapter{Background}
+
+Here, we present a summary of the theory and literature required to understand the experiments presented in this work. We focus on CT reconstruction, diffusion models and their use in solving inverse problems, and the PaDIS method. We then summarise the literature relevant to PaDIS, including both its motivators and derivatives. The formulation presented in \ref{sec:basics} summarises the key points presented by Kak and Stanley \ref{Kak_Stanley}, and utilises their notation.
+
+\section{Computed Tomography}
+\label{sec:basics}
+
+In X-ray CT, an object is illuminated by X-rays from multiple angles, with the intensity of radiation transmitted through the object measured by detectors the opposite side of the object. Through this method, we aim to reconstruct a spatial distribution of the linear attenuation coefficient, written $f(x,y)$ in the two-dimensional case, and with units of inverse length. This gives the probability per unit path length that an X-ray photon is removed from the beam by absorption or scattering. Therefore, assuming X-rays are monoenergetic, the transmitted intensity along a ray $L$ should obey the Beer-Lambert law,
+\[
+I=I_0 \exp\left(-\int_L f(x,y) \, ds\right),
+\]
+where $I_0$ is the intensity of radiation incident on the object, $I$ is the detected intensity, and $ds$ denotes integration along the ray. Taking logarithms therefore then gives the linearised projection
+\[
+P=-\log\left(\frac{I}{I_0}\right)=\int_Lf(x,y)\, ds,
+\]
+meaning log-normalised CT measurements are approximated by a line integral through the attenuation image. This approach assumes that beams are narrow, monoenergetic and non-diffracting, and neglects scattering, beam hardening and finite aperture effects, all of which contribute in clinical CT. However, it provides a tractable mathematical basis within which to consider reconstruction algorithms.
+
+\subsection{Detector Geometries}
+
+There are three common CT detector geometries; parallel-beam, fan-beam, and cone-beam. Parallel-beam assumes we have a linear array of X-ray sources, each focussed solely on a detector placed on the other side of the sample. These rays are therefore parallel, as illustrated in Figure \ref{fig:geometries}a. This is impractical to implement clinically, but allows for tractable mathematics for the Radon transform and the Fourier slice theorem.
+
+Fan-beam CT is often used in practice, and utilises a point source from which a fan-blade of emissions are measured by an line of detectors. Writing the source position as $S(\beta)$ for a source angle $\beta$, and $d(\beta, \gamma)$ as the unit direction of a ray labelled by fan angle $\gamma$ allows us to write a fan-beam projection as
+\[
+R_\beta(\gamma) = \int_0^\infty f(S(\beta)+sd(\beta, \gamma))\, ds,
+\]
+where we assume the sample has compact support such that $f(\mathbf{r})=0$ outside of the object.
+
+Cone-beam CT extends this to three dimensions, again using a point source, but now a two-dimensional array of detectors with coordinates labeled $u$ and $v$, such that the cone-beam projection has the form
+\[
+R_\beta(u,v)=\int_0^\infty f(S(\beta)+sd(\beta, u,v))\, ds.
+\]
+Note, however, that by restricting the cone-beam geometry to a single strip of detectors recovers the fan-beam geometry.
+
+\subsection{Line Integrals, Projections and Sinograms}
+
+For a fixed projection angle $\theta$, we can define a line in the image plane by
+\begin{equation}
+x\cos \theta + y\sin \theta=t,
+\label{eq:line_t}
+\end{equation}
+where $t$ is the perpendicular distance of the line from the origin, as shown in Figure \ref{fig:line_integral}. The integral over this line can then be denoted as
+\begin{equation}
+P_\theta(t) = \int_{L_{(\theta,t)}} f(x,y) \, ds,
+\label{eq:line_integral}
+\end{equation}
+or equivalently in Dirac delta form,
+\[
+P_\theta(t)=\int_{-\infty}^\infty \int_{-\infty}^\infty  f(x,y)\delta(x\cos \theta+ y\sin \theta-t) \, dx\, dy.
+\]
+Notably, the projection $P_\theta(t)$ is therefore also the Radon transform \cite{radon} of $f(x,y)$ at angle $\theta$. We collect a line or grid of these projections simultaneously, each corresponding to the same $\theta$ alignment, but different values of $t$. In a hypothetical parallel-beam scan, all of these $\theta$-aligned rays are parallel, whereas in a realistic fan-beam or cone-beam scan, the angle refers to the central projection angle, from which other rays diverge.
+
+In practice, we sample these projection lines from $K$ different angular views, $\theta_1, \theta_2, \dots, \theta_K$, and collect the projections within $N$ detector bins corresponding to $t_1, t_2, \dots t_N$, forming an array of measurements called a sinogram, denoted
+\[
+Y_{j,i}=P_{\theta_i}(t_j), \quad i=1,\dots, K, \quad j=1,\dots, N.
+\]
+Here, each column is a line of projections at directed angle $\theta$, and each row corresponds to one detector bin. By vectorising the image of $f(x,y)$ as $\mathbf{x}\in \mathbb{R}^n$, and the sinogram as $\mathbf{y}\in \mathbb{R}^m$, the discretised CT forward model can be written as
+\begin{equation}
+\mathbf{y}=A\mathbf{x}+\boldsymbol{\eta},
+\label{eq:forward-model}
+\end{equation}
+where $A\in \mathbb{R}^{m \times n}$ is the discretised forward projection operator, $\boldsymbol{\eta}$ encodes noise and modelling errors, and $m=KN$ in 2D. We can then express this operator $A$ explicitly by denoting an image pixel $\ell$ by $\Omega_\ell$, and using the pixel basis function
+\[
+\phi_\ell(x,y)=
+\begin{cases}
+1, & (x,y)\in \Omega_\ell,\\
+0, & \text{otherwise},
+\end{cases}
+\]
+such that we can approximate the attenuation field as
+\[
+f(x,y)\approx \sum_{\ell=1}^n x_\ell \phi_\ell(x,y),
+\]
+where $x_l$ is the value of pixel $l$. Therefore, substituting into \ref{eq:line_integral} and then comparing with \ref{eq:forward-model} gives
+\begin{align}
+P_{\theta_i}(t_j)
+&\approx
+\sum_{\ell=1}^n x_\ell
+\int_{L_{(\theta_i,t_j)}} \phi_\ell(x,y)\,ds\\
+\implies A_{(j,i),\ell}&=\int_{L_{(\theta_i, t_j)}}\phi_\ell(x,y)\, ds,
+\end{align}
+so each row of $A$ corresponds to a single measured ray, with entries encoding the path length of that ray within each image pixel. This matrix is generally extremely large, and impractical to store or manipulate.
+
+\subsection{The Fourier Slice Theorem}
+
+Using the perpendicular distance of a ray from the origin, \eqref{eq:line_t} and the distance along that ray given by
+\[
+s=-x\sin \theta+ y \cos\theta
+\]
+give the projection at angle $\theta$ as
+\[
+P_\theta(t)=
+\int_{-\infty}^{\infty}
+f(t\cos\theta-s\sin\theta,\;t\sin\theta+s\cos\theta)\,ds.
+\]
+Taking the Fourier transform of this with respect to $t$ then gives
+\[
+S_\theta(\omega)
+=
+\int_{-\infty}^{\infty}\int_{-\infty}^{\infty}
+f(t\cos\theta-s\sin\theta,\;t\sin\theta+s\cos\theta)
+e^{-2\pi i \omega t}
+\,ds\,dt,
+\]
+so converting to the $(x,y)$ coordinate system gives
+\[
+S_\theta(\omega)
+=
+\int_{-\infty}^{\infty}\int_{-\infty}^{\infty}
+f(x,y)e^{-2\pi i\omega(x\cos\theta+y\sin\theta)}
+\,dx\,dy = F(\omega \cos \theta, \omega \sin \theta).
+\]
+Therefore, the Fourier transform of a projection gives the two-dimensional Fourier transform of the object along the radial line at the same angle, as illustrated in Figure \ref{fig:fourier_slice_theorem}.
+
+\subsection{Dosage and Noise}
+
+The radiation dose imparted on a patient is directly proportional to the total energy deposited in the tissue. For this reason, it is also directly proportional to the energy of the photons used, the number of photons released at each view, and the number of views acquired. Dosage can therefore be reduced by decreasing any of these properties. However, these each decrease imaging quality.
+
+Measurement noise is intrinsically linked to the intensity of radiation used. If $N_0$ photons are incident on the sample along a ray with projection value $p$, then we expect to detect
+\[
+\bar N = N_0 \exp(-p).
+\]
+As this is a counting experiment, the noise due to counting errors can be approximated as Poisson such that
+\[
+N\sim \operatorname{Poisson}(\bar N).
+\]
+The projection estimate,
+\[
+\hat p =-\log \left(\frac{N}{N_0}\right),
+\]
+so at high photon counts where the $\operatorname{Poisson}(\bar N)\approx \mathcal{N}(\bar N, \bar N)$, Taylor expansion gives
+\[
+\hat p \approx p+\eta, \quad \eta \sim \mathcal N\left(0, \frac{1}{\bar N}\right),
+\]
+at low photon counts (intensities), however, we may have $N=0$, in which case $\hat p=-\log 0$, which is undefined. Furthermore, relative fluctuations are large, preventing Taylor expansion, and in general, the noise after the logarithm becomes non-gaussian, signal-dependent, biased and possibly undefined \cite{}, meaning this domain is often better to model with the Poisson likelihood. Decreasing intensity therefore increases the difficulty in modelling, and is not discussed in detail in this work. However, interesting advances in using diffusion models trained with these sorts of priors can be found at \cite{}.
+
+Decreasing the number of views also decreases the dosage, but in accordance with the Fourier slice theorem, this also limits the angular coverage of the Fourier space corresponding to $f(x,y)$, with only a finite set of radial Fourier lines being directly sampled. The unsampled angular regions must therefore be inferred by a reconstruction algorithm or a prior, motivating the use of the learned image priors discussed in \S\ref{sec:Diffusion_Models}.
+
+\subsection{Hounsfield Units}
+
+Medical CT images are often displayed in Hounsfield units (HU) with restricted ranges. These normalise attenuation values with respect to water and air such that
+\[
+\text{HU}=1000\frac{\mu - \mu_\text{water}}{\mu_\text{water}-\mu_\text{air}}\approx 1000\left(\frac{\mu}{\mu_\text{water}}-1\right),
+\]
+giving water a value around 0 HU and air around -1000 HU.
+
+\section{Diffusion Models}
+\label{sec:Diffusion_Models}
+
+A diffusion model is a constrained version of a Variational Autoencoder \cite{} where a fixed encoder is used to gradually corrupt data, and a learned decoder acts to reverse this process. Where $\mathbf{x}$ denotes a clean data sample and $\mathbf{z}_1, \dots, \mathbf{z}_T$ denote noisy latent variables, the forward process is
+\[
+\begin{aligned}
+\mathbf{z}_1 &= \sqrt{1-\beta_1}\mathbf{x}+\sqrt{\beta_1}\boldsymbol{\epsilon}_1,\\
+\mathbf{z}_t &= \sqrt{1-\beta_t}\mathbf{z}_{t-1}+\sqrt{\beta_t}\boldsymbol{\epsilon}_t,\qquad t=2,\ldots,T,
+\end{aligned}
+\]
+where $\epsilon_t \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$ and $\beta_t$ is the noise schedule. This can equivalently be written as
+\[
+q(\mathbf{z}_t\mid \mathbf{z}_{t-1})=\operatorname{Norm}_{\mathbf{z}_t}\left[\sqrt{1-\beta_t}\mathbf{z}_{t-1},\beta_t\mathbf{I}\right].
+\]
+By defining
+\[
+\alpha_t=\prod_{s=1}^t(1-\beta_s)
+\]
+and recursively combining Gaussian noise terms, we obtain the diffusion kernel
+\begin{align}
+\mathbf{z}_t&=\sqrt{\alpha_t}\mathbf{x}+\sqrt{1-\alpha_t}\boldsymbol{\epsilon}\\
+\implies
+q(\mathbf{z}_t\mid \mathbf{x})&=\operatorname{Norm}_{\mathbf{z}_t}\left[\sqrt{\alpha_t}\mathbf{x},(1-\alpha_t)\mathbf{I}\right],
+\end{align}
+allowing for arbitrary noisy latents to be sampled directly from $\mathbf{x}$ without simulating all previous steps.
+
+\subsection{Score-Based SDEs and Variance-Exploding Models}
+
+\subsection{The Suitability of Variance-Exploding Models for CT Imaging}
+
+\subsection{The PaDIS Approach}
+
+\section{Reconstruction Methods}
+
+\subsection{Filtered Back-Projection and the FDK Method}
+
+\subsection{Iterative Reconstruction and Denoising Priors}
+
+\subsection{Diffusion Models for Inverse Problems}
