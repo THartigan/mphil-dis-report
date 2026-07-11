@@ -216,114 +216,114 @@ giving water a value around 0 HU and air around -1000 HU.
 \section{Diffusion Models}
 \label{sec:diffusion_models}
 
-A diffusion model is a constrained version of a Variational Autoencoder \cite{} where a fixed encoder is used to gradually corrupt data, and a learned decoder acts to reverse this process. Where $\mathbf{x}$ denotes a clean data sample and $\mathbf{z}_1, \dots, \mathbf{z}_T$ denote noisy latent variables, the forward process is
+% A diffusion model is a constrained version of a Variational Autoencoder \cite{} where a fixed encoder is used to gradually corrupt data, and a learned decoder acts to reverse this process. Where $\mathbf{x}$ denotes a clean data sample and $\mathbf{z}_1, \dots, \mathbf{z}_T$ denote noisy latent variables, the forward process is
 
-\begin{align}
-\mathbf{z}_1 &= \sqrt{1-\beta_1}\mathbf{x}+\sqrt{\beta_1}\boldsymbol{\epsilon}_1,\\
-\mathbf{z}_t &= \sqrt{1-\beta_t}\mathbf{z}_{t-1}+\sqrt{\beta_t}\boldsymbol{\epsilon}_t,\qquad t=2,\ldots,T,
-\label{eq:ddpm_forward_process}
-\end{align}
+% \begin{align}
+% \mathbf{z}_1 &= \sqrt{1-\beta_1}\mathbf{x}+\sqrt{\beta_1}\boldsymbol{\epsilon}_1,\\
+% \mathbf{z}_t &= \sqrt{1-\beta_t}\mathbf{z}_{t-1}+\sqrt{\beta_t}\boldsymbol{\epsilon}_t,\qquad t=2,\ldots,T,
+% \label{eq:ddpm_forward_process}
+% \end{align}
 
-where $\boldsymbol{\epsilon}_t \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$ and $\beta_t$ is the discrete noise schedule. This can equivalently be written as
+% where $\boldsymbol{\epsilon}_t \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$ and $\beta_t$ is the discrete noise schedule. This can equivalently be written as
 
-\begin{equation}
-q(\mathbf{z}_t\mid \mathbf{z}_{t-1})=\operatorname{Norm}_{\mathbf{z}_t}\left[\sqrt{1-\beta_t}\mathbf{z}_{t-1},\beta_t\mathbf{I}\right].
-\label{eq:ddpm_forward_transition}
-\end{equation}
+% \begin{equation}
+% q(\mathbf{z}_t\mid \mathbf{z}_{t-1})=\operatorname{Norm}_{\mathbf{z}_t}\left[\sqrt{1-\beta_t}\mathbf{z}_{t-1},\beta_t\mathbf{I}\right].
+% \label{eq:ddpm_forward_transition}
+% \end{equation}
 
-By defining
+% By defining
 
-\begin{equation}
-\bar{\alpha}_t=\prod_{s=1}^t(1-\beta_s)
-\label{eq:alpha_bar_definition}
-\end{equation}
+% \begin{equation}
+% \bar{\alpha}_t=\prod_{s=1}^t(1-\beta_s)
+% \label{eq:alpha_bar_definition}
+% \end{equation}
 
-and recursively combining Gaussian noise terms, we obtain the diffusion kernel
+% and recursively combining Gaussian noise terms, we obtain the diffusion kernel
 
-\begin{align}
-\mathbf{z}_t&=\sqrt{\bar{\alpha}_t}\mathbf{x}+\sqrt{1-\bar{\alpha}_t}\boldsymbol{\epsilon}\\
-\implies
-q(\mathbf{z}_t\mid \mathbf{x})&=\operatorname{Norm}_{\mathbf{z}_t}\left[\sqrt{\bar{\alpha}_t}\mathbf{x},(1-\bar{\alpha}_t)\mathbf{I}\right],
-\label{eq:forward_kernel}
-\end{align}
+% \begin{align}
+% \mathbf{z}_t&=\sqrt{\bar{\alpha}_t}\mathbf{x}+\sqrt{1-\bar{\alpha}_t}\boldsymbol{\epsilon}\\
+% \implies
+% q(\mathbf{z}_t\mid \mathbf{x})&=\operatorname{Norm}_{\mathbf{z}_t}\left[\sqrt{\bar{\alpha}_t}\mathbf{x},(1-\bar{\alpha}_t)\mathbf{I}\right],
+% \label{eq:forward_kernel}
+% \end{align}
 
-allowing for arbitrary noisy latents to be sampled directly from $\mathbf{x}$ without simulating all previous steps.
+% allowing for arbitrary noisy latents to be sampled directly from $\mathbf{x}$ without simulating all previous steps.
 
-The reverse transitions $q(\mathbf{z}_{t-1}|\mathbf{z}_t)$, however, cannot be determined analytically due to the unknown data distribution. Instead, DDPM models learn a Gaussian approximation
+% The reverse transitions $q(\mathbf{z}_{t-1}|\mathbf{z}_t)$, however, cannot be determined analytically due to the unknown data distribution. Instead, DDPM models learn a Gaussian approximation
 
-\begin{equation}
-p_{\boldsymbol{\phi}}(\mathbf{z}_{t-1}\mid \mathbf{z}_t)=\operatorname{Norm}_{\mathbf{z}_{t-1}}\left[\mathbf{f}_{\boldsymbol{\phi}}(\mathbf{z}_t,t),\sigma_t^2\mathbf{I}\right].
-\label{eq:learned_reverse_transition}
-\end{equation}
+% \begin{equation}
+% p_{\boldsymbol{\phi}}(\mathbf{z}_{t-1}\mid \mathbf{z}_t)=\operatorname{Norm}_{\mathbf{z}_{t-1}}\left[\mathbf{f}_{\boldsymbol{\phi}}(\mathbf{z}_t,t),\sigma_t^2\mathbf{I}\right].
+% \label{eq:learned_reverse_transition}
+% \end{equation}
 
-Chaining many of these denoising steps allows for construction of the joint distribution, $p_{\boldsymbol{\phi}}(\mathbf{x}, \mathbf{z}_{1, \dots, T})$, which can then be used to derive the evidence lower bound, ELBO such that
+% Chaining many of these denoising steps allows for construction of the joint distribution, $p_{\boldsymbol{\phi}}(\mathbf{x}, \mathbf{z}_{1, \dots, T})$, which can then be used to derive the evidence lower bound, ELBO such that
 
-\begin{equation}
-\log p_{\boldsymbol{\phi}}(\mathbf{x})\ge \text{ELBO}(\mathbf{x}; \boldsymbol{\phi}).
-\label{eq:elbo_bound}
-\end{equation}
+% \begin{equation}
+% \log p_{\boldsymbol{\phi}}(\mathbf{x})\ge \text{ELBO}(\mathbf{x}; \boldsymbol{\phi}).
+% \label{eq:elbo_bound}
+% \end{equation}
 
-Minimising the negative ELBO therefore trains a network to predict slightly denoised latents $\mathbf{z}_{t-1}$ from the noisier $\mathbf{z}_t$ versions.
+% Minimising the negative ELBO therefore trains a network to predict slightly denoised latents $\mathbf{z}_{t-1}$ from the noisier $\mathbf{z}_t$ versions.
 
-Using Bayes theorem along with the Gaussian change of variables identity and the product of two Gaussians combination identity allows us to express
+% Using Bayes theorem along with the Gaussian change of variables identity and the product of two Gaussians combination identity allows us to express
 
-\begin{align}
-q(\mathbf{z}_{t-1}|\mathbf{z}_t, \mathbf{x})
-&=\frac{q(\mathbf{z}_t|\mathbf{z}_{t-1}, \mathbf{x}) q(\mathbf{z}_{t-1}|\mathbf{x})}{q(\mathbf{z}_t|\mathbf{x})}\\
-&=\operatorname{Norm}_{\mathbf{z}_t}\left[\sqrt{1-\beta_t}\mathbf{z}_{t-1}, \beta_t\mathbf{I}\right]\operatorname{Norm}_{\mathbf{z}_{t-1}}\left[\sqrt{\bar{\alpha}_{t-1}}\mathbf{x}, (1-\bar{\alpha}_{t-1})\mathbf{I}\right]\\
-&=\operatorname{Norm}_{\mathbf{z}_{t-1}}\left[\frac{(1-\bar{\alpha}_{t-1})}{1-\bar{\alpha}_t}\sqrt{1-\beta_t}\mathbf{z}_t+\frac{\sqrt{\bar{\alpha}_{t-1}}\beta_t}{1-\bar{\alpha}_t}\mathbf{x}, \frac{\beta_t(1-\bar{\alpha}_{t-1})}{1-\bar{\alpha}_t}\mathbf{I}\right].
-\label{eq:reverse_normal}
-\end{align}
+% \begin{align}
+% q(\mathbf{z}_{t-1}|\mathbf{z}_t, \mathbf{x})
+% &=\frac{q(\mathbf{z}_t|\mathbf{z}_{t-1}, \mathbf{x}) q(\mathbf{z}_{t-1}|\mathbf{x})}{q(\mathbf{z}_t|\mathbf{x})}\\
+% &=\operatorname{Norm}_{\mathbf{z}_t}\left[\sqrt{1-\beta_t}\mathbf{z}_{t-1}, \beta_t\mathbf{I}\right]\operatorname{Norm}_{\mathbf{z}_{t-1}}\left[\sqrt{\bar{\alpha}_{t-1}}\mathbf{x}, (1-\bar{\alpha}_{t-1})\mathbf{I}\right]\\
+% &=\operatorname{Norm}_{\mathbf{z}_{t-1}}\left[\frac{(1-\bar{\alpha}_{t-1})}{1-\bar{\alpha}_t}\sqrt{1-\beta_t}\mathbf{z}_t+\frac{\sqrt{\bar{\alpha}_{t-1}}\beta_t}{1-\bar{\alpha}_t}\mathbf{x}, \frac{\beta_t(1-\bar{\alpha}_{t-1})}{1-\bar{\alpha}_t}\mathbf{I}\right].
+% \label{eq:reverse_normal}
+% \end{align}
 
-Therefore, if the clean image $\mathbf{x}$ were known, the exact reverse transition would also be known. We can therefore equivalently train a denoising model to predict clean images, conditioned on the noisy image and the noise level, $\hat{\mathbf{x}}_\boldsymbol{\phi}$, such that
+% Therefore, if the clean image $\mathbf{x}$ were known, the exact reverse transition would also be known. We can therefore equivalently train a denoising model to predict clean images, conditioned on the noisy image and the noise level, $\hat{\mathbf{x}}_\boldsymbol{\phi}$, such that
 
-\begin{equation}
-\mathbf{x}\approx \hat {\mathbf{x}}_{\boldsymbol{\phi}}(\mathbf{z}_t, t).
-\label{eq:x0_prediction}
-\end{equation}
+% \begin{equation}
+% \mathbf{x}\approx \hat {\mathbf{x}}_{\boldsymbol{\phi}}(\mathbf{z}_t, t).
+% \label{eq:x0_prediction}
+% \end{equation}
 
-When used in conjunction with \eqref{eq:reverse_normal}, this provides a local denoising direction, allowing repeated movement to slightly cleaner states.
+% When used in conjunction with \eqref{eq:reverse_normal}, this provides a local denoising direction, allowing repeated movement to slightly cleaner states.
 
-Equation \eqref{eq:forward_kernel} also shows that predicting $\mathbf{x}$ is equivalent to predicting the noise added to it at a given diffusion step, so
+% Equation \eqref{eq:forward_kernel} also shows that predicting $\mathbf{x}$ is equivalent to predicting the noise added to it at a given diffusion step, so
 
-\begin{equation}
-\boldsymbol{\epsilon}_{\boldsymbol{\phi}}(\mathbf{z}_t,t)
-=
-\frac{\mathbf{z}_t-\sqrt{\bar{\alpha}_t}\hat{\mathbf{x}}_{\boldsymbol{\phi}}(\mathbf{z}_t,t)}{\sqrt{1-\bar{\alpha}_t}}.
-\label{eq:epsilon_from_x_prediction}
-\end{equation}
+% \begin{equation}
+% \boldsymbol{\epsilon}_{\boldsymbol{\phi}}(\mathbf{z}_t,t)
+% =
+% \frac{\mathbf{z}_t-\sqrt{\bar{\alpha}_t}\hat{\mathbf{x}}_{\boldsymbol{\phi}}(\mathbf{z}_t,t)}{\sqrt{1-\bar{\alpha}_t}}.
+% \label{eq:epsilon_from_x_prediction}
+% \end{equation}
 
-In this formulation, we can simplify the ELBO with Gaussian identities and the properties of the KL divergence, giving rise to the standard DDPM training loss \cite{},
+% In this formulation, we can simplify the ELBO with Gaussian identities and the properties of the KL divergence, giving rise to the standard DDPM training loss \cite{},
 
-\begin{equation}
-\mathcal{L}_{\mathrm{DDPM}}(\boldsymbol{\phi})=
-\mathbb{E}_{\mathbf{x},t,\boldsymbol{\epsilon}}
-\left[
-\left\|
-\boldsymbol{\epsilon}-\boldsymbol{\epsilon}_{\boldsymbol{\phi}}
-\left(\sqrt{\bar{\alpha}_t}\mathbf{x}+\sqrt{1-\bar{\alpha}_t}\boldsymbol{\epsilon},t\right)
-\right\|_2^2
-\right].
-\label{eq:ddpm_training_loss}
-\end{equation}
+% \begin{equation}
+% \mathcal{L}_{\mathrm{DDPM}}(\boldsymbol{\phi})=
+% \mathbb{E}_{\mathbf{x},t,\boldsymbol{\epsilon}}
+% \left[
+% \left\|
+% \boldsymbol{\epsilon}-\boldsymbol{\epsilon}_{\boldsymbol{\phi}}
+% \left(\sqrt{\bar{\alpha}_t}\mathbf{x}+\sqrt{1-\bar{\alpha}_t}\boldsymbol{\epsilon},t\right)
+% \right\|_2^2
+% \right].
+% \label{eq:ddpm_training_loss}
+% \end{equation}
 
-Applying Tweedie's formula \cite{} to \eqref{eq:forward_kernel}, and applying the known form of a Gaussian mean, we can then also show that
+% Applying Tweedie's formula \cite{} to \eqref{eq:forward_kernel}, and applying the known form of a Gaussian mean, we can then also show that
 
-\begin{equation}
-\nabla_{\mathbf{z}_t}\log p_t(\mathbf{z}_t)
-\approx
--\frac{\boldsymbol{\epsilon}_{\boldsymbol{\phi}}(\mathbf{z}_t,t)}{\sqrt{1-\bar{\alpha}_t}},
-\label{eq:ddpm_score_from_noise}
-\end{equation}
+% \begin{equation}
+% \nabla_{\mathbf{z}_t}\log p_t(\mathbf{z}_t)
+% \approx
+% -\frac{\boldsymbol{\epsilon}_{\boldsymbol{\phi}}(\mathbf{z}_t,t)}{\sqrt{1-\bar{\alpha}_t}},
+% \label{eq:ddpm_score_from_noise}
+% \end{equation}
 
-where we notice the left hand term is equal to the score of the distribution of noisy latents at time $t$. In general, we define this as
+% where we notice the left hand term is equal to the score of the distribution of noisy latents at time $t$. In general, we define this as
 
-\begin{equation}
-\mathbf{s}_t(\mathbf{z})=\nabla_{\mathbf{z}}\log p_t(\mathbf{z}).
-\label{eq:score_definition}
-\end{equation}
+% \begin{equation}
+% \mathbf{s}_t(\mathbf{z})=\nabla_{\mathbf{z}}\log p_t(\mathbf{z}).
+% \label{eq:score_definition}
+% \end{equation}
 
-Therefore, predicting the slightly denoised latent, $\mathbf{z}_{t-1}$, the fully denoised image, $\mathbf{x}$, the noise, $\boldsymbol{\epsilon}$, and the score, $\nabla_{\mathbf{z}} \log p_t(\mathbf{z})$ are equivalent parameterisations of the same reverse process. For inverse problems, the score parameterisation is particularly useful because it gives a learned prior gradient, which can be exploited in conjunction with measurement-consistency terms from forward models.
+% Therefore, predicting the slightly denoised latent, $\mathbf{z}_{t-1}$, the fully denoised image, $\mathbf{x}$, the noise, $\boldsymbol{\epsilon}$, and the score, $\nabla_{\mathbf{z}} \log p_t(\mathbf{z})$ are equivalent parameterisations of the same reverse process. For inverse problems, the score parameterisation is particularly useful because it gives a learned prior gradient, which can be exploited in conjunction with measurement-consistency terms from forward models.
 
 \subsection{Score-Based SDEs and Variance-Exploding Models}
 \label{sec:score_based_sdes}
